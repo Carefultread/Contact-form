@@ -104,20 +104,54 @@ form.addEventListener('submit', async (e) => {
     submitBtn.textContent = 'Sending...';
 
     try {
-        // Simulate form submission
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Collect form data
+        const formData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            subject: document.getElementById('subject').value,
+            message: document.getElementById('message').value,
+            timestamp: new Date().toLocaleString()
+        };
 
-        // Show success message
-        successMessage.textContent = '✓ Message sent successfully! Thank you for reaching out. I\'ll get back to you soon.';
-        successMessage.classList.add('show');
+        // Send email via EmailJS
+        // You need to set up EmailJS first at https://www.emailjs.com/
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                service_id: 'service_contact_form',
+                template_id: 'template_contact_form',
+                user_id: 'YOUR_EMAILJS_PUBLIC_KEY', // Replace with your EmailJS public key
+                template_params: {
+                    to_email: 'bhebhezoxonto@gmail.com',
+                    from_name: formData.name,
+                    from_email: formData.email,
+                    phone: formData.phone,
+                    subject: formData.subject,
+                    message: formData.message,
+                    timestamp: formData.timestamp
+                }
+            })
+        });
 
-        // Reset form
-        form.reset();
-        
-        // Clear success message after 5 seconds
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-        }, 5000);
+        if (response.ok) {
+            // Show success message
+            successMessage.textContent = '✓ Message sent successfully to Zeph Khoza! I\'ll get back to you soon.';
+            successMessage.classList.add('show');
+
+            // Reset form
+            form.reset();
+            
+            // Clear success message after 5 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 5000);
+        } else {
+            throw new Error('Failed to send email');
+        }
 
     } catch (error) {
         console.error('Error submitting form:', error);
@@ -128,10 +162,9 @@ form.addEventListener('submit', async (e) => {
         successMessage.classList.add('show');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
+        submitBtn.textContent = 'Send Message to Zeph Khoza';
     }
 }
 );
 
-// Log form data for demonstration
 console.log('Contact Form initialized and ready to use');
