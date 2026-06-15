@@ -115,29 +115,22 @@ form.addEventListener('submit', async (e) => {
         };
 
         // Send email via EmailJS
-        // You need to set up EmailJS first at https://www.emailjs.com/
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        const response = await emailjs.send(
+            'service_contact_form',
+            'template_contact_form',
+            {
+                to_email: 'bhebhezoxonto@gmail.com',
+                from_name: formData.name,
+                from_email: formData.email,
+                phone: formData.phone,
+                subject: formData.subject,
+                message: formData.message,
+                timestamp: formData.timestamp
             },
-            body: JSON.stringify({
-                service_id: 'service_contact_form',
-                template_id: 'template_contact_form',
-                user_id: 'YOUR_EMAILJS_PUBLIC_KEY', // Replace with your EmailJS public key
-                template_params: {
-                    to_email: 'bhebhezoxonto@gmail.com',
-                    from_name: formData.name,
-                    from_email: formData.email,
-                    phone: formData.phone,
-                    subject: formData.subject,
-                    message: formData.message,
-                    timestamp: formData.timestamp
-                }
-            })
-        });
+            'CNuHYniH32CU2Thkv'
+        );
 
-        if (response.ok) {
+        if (response.status === 200) {
             // Show success message
             successMessage.textContent = '✓ Message sent successfully to Zeph Khoza! I\'ll get back to you soon.';
             successMessage.classList.add('show');
@@ -166,5 +159,8 @@ form.addEventListener('submit', async (e) => {
     }
 }
 );
+
+// Initialize EmailJS
+emailjs.init('CNuHYniH32CU2Thkv');
 
 console.log('Contact Form initialized and ready to use');
