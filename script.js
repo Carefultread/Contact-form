@@ -105,14 +105,14 @@ form.addEventListener('submit', async (e) => {
 
     try {
         // Collect form data
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value,
-            timestamp: new Date().toLocaleString()
-        };
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+        const timestamp = new Date().toLocaleString();
+
+        console.log('Sending email with data:', { name, email, phone, subject, message });
 
         // Send email via EmailJS
         const response = await emailjs.send(
@@ -120,19 +120,24 @@ form.addEventListener('submit', async (e) => {
             'template_contact_form',
             {
                 to_email: 'bhebhezoxonto@gmail.com',
-                from_name: formData.name,
-                from_email: formData.email,
-                phone: formData.phone,
-                subject: formData.subject,
-                message: formData.message,
-                timestamp: formData.timestamp
-            },
-            'CNuHYniH32CU2Thkv'
+                from_name: name,
+                from_email: email,
+                phone: phone || 'Not provided',
+                subject: subject,
+                message: message,
+                timestamp: timestamp,
+                reply_to: email
+            }
         );
+
+        console.log('EmailJS Response:', response);
 
         if (response.status === 200) {
             // Show success message
             successMessage.textContent = '✓ Message sent successfully to Zeph Khoza! I\'ll get back to you soon.';
+            successMessage.style.borderColor = '#10b981';
+            successMessage.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            successMessage.style.color = '#10b981';
             successMessage.classList.add('show');
 
             // Reset form
@@ -143,12 +148,23 @@ form.addEventListener('submit', async (e) => {
                 successMessage.classList.remove('show');
             }, 5000);
         } else {
-            throw new Error('Failed to send email');
+            throw new Error('Failed to send email: ' + response.status);
         }
 
     } catch (error) {
         console.error('Error submitting form:', error);
-        successMessage.textContent = '✗ There was an error sending your message. Please try again.';
+        console.error('Error details:', error.text || error.message);
+        
+        let errorMsg = '✗ There was an error sending your message. ';
+        if (error.text) {
+            errorMsg += 'Details: ' + error.text;
+        } else if (error.message) {
+            errorMsg += 'Details: ' + error.message;
+        } else {
+            errorMsg += 'Please check the console for more details.';
+        }
+        
+        successMessage.textContent = errorMsg;
         successMessage.style.borderColor = '#ef4444';
         successMessage.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
         successMessage.style.color = '#ef4444';
@@ -161,6 +177,7 @@ form.addEventListener('submit', async (e) => {
 );
 
 // Initialize EmailJS
+console.log('Initializing EmailJS with public key: CNuHYniH32CU2Thkv');
 emailjs.init('CNuHYniH32CU2Thkv');
 
 console.log('Contact Form initialized and ready to use');
